@@ -13,6 +13,7 @@ function loadFile(file)
 
 exports.test01 = function(test) {
 	test.expect(4);
+	
 	var config = loadFile('test01.pure');
 	test.deepEqual({ port: 8443, bind: '0.0.0.0' }, config._obj);
 
@@ -25,6 +26,7 @@ exports.test01 = function(test) {
 }
 exports.test02 = function(test) {
 	test.expect(4);
+
 	var config = loadFile('test02.pure');
 	test.deepEqual({ server: { port: 8443, bind: '0.0.0.0' } }, config._obj);
 
@@ -41,6 +43,8 @@ exports.test03 = function(test) {
 	test.done();
 }
 exports.test04 = function(test) {
+	test.expect(3);
+
 	var config = loadFile('test04.pure');
 	test.deepEqual({
 		server: { port: 8443, bind: '0.0.0.0', log: { level: 'debug' } },
@@ -54,6 +58,10 @@ exports.test04 = function(test) {
 			log: { level: 'info' }
 		}
 	}, config._obj);
+
+	test.strictEqual(true, config.has('database.url'));
+	test.strictEqual(false, config.has('database.URL'));
+
 	test.done();
 }
 exports.test05 = function(test) {

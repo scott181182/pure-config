@@ -32,7 +32,7 @@ class Configuration {
    *	Instance Methods for retrieving configuration data
 	 */
 	get(key) { return _.get(this._obj, key); }
-	has(key) { return !!_.get(this._obj, key) }
+	has(key) { return _.has(this._obj, key) }
 	//type(key) { return _.get(this._map, key); }
 
 	/* Get specific types. Technically unneccesary in JavaScript, but I'll allow limited value coersions */
