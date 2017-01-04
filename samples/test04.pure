@@ -1,0 +1,20 @@
+# Server configuration
+server
+    port = 8443
+    bind = 0.0.0.0
+
+# Db configuration
+database
+    url = something-cool-here
+    user = sys
+    password = something
+    timeout = 30s
+
+    # Another nesting level (there's no limit)
+    data
+        path = ../data
+        indexed = true
+
+# A separate section with log levels
+server.log.level = debug
+database.log.level = info

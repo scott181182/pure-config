@@ -1,0 +1,21 @@
+{
+  "name": "pure-config",
+  "version": "0.0.1",
+  "description": "A JavaScript Parser for the Pure Config Specification (https://github.com/pureconfig/pureconfig)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "Pure",
+    "Config"
+  ],
+  "author": "Scott Fasone",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.3"
+  },
+  "devDependencies": {
+    "nodeunit": "^0.10.2"
+  }
+}

@@ -1,0 +1,4 @@
+vars.filename = thefile.txt
+
+# Later on, we need to reference vars.filename
+server.data => vars.filename

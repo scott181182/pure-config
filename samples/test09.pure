@@ -1,0 +1,16 @@
+servers = 
+[
+    app-1
+        host = 1.2.3.4
+        port = 8443
+        datadir = ./data   
+    app-2 => servers.app-1
+       host = 1.2.3.5
+    dbserver
+       host = 1.2.3.6
+       port = 9931
+]
+
+# DevOp drama! We need tracing on app-1
+servers.app-1.log.level = trace
+servers.app-2.log.level = info
