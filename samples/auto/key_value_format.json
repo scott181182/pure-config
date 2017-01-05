@@ -1,0 +1,11 @@
+{
+	"whitespace_test_1" : "obviously this works",
+	"whitespace_test_2" : "this should work too.",
+	"whitespace_test_3" : "this also works.",
+	"whitespace_test_4" : "tabs work too.",
+
+	"empty_string" : "",
+	"spaces_trimmed" : "",
+
+	"equals_sign_test" : "this string has an = sign in it."
+}

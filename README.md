@@ -28,9 +28,15 @@ config.set('server.port', 8080); // Sets whatever type you give it
 config.put('server.port', 80);
 
 config.getString('log.level');  // Returns a string
+
+// Paths must start with a Drive Letter (i.e. 'C:'), dot(s) (i.e. '.' or '..'), tilde '~', or root ('\' or '/')
 config.getPath('server.log');   // Returns the string representation of the path
+
 config.getQuantity('bandwidth') // Returns an object: { magnitude: [number], unit: [string] }
 config.getInt('my-number')      // Returns round number, or rounds floating points, or tries to coerce other types
 config.getDouble('pi')          // Returns a number, or tries to coerce other types
 config.getBoolean('isAdmin')    // Returns a boolean, or tries to coerce other types
 ```
+
+## Other Features
+This implementation of the Pure Specification does not currently support the optional Schema mechanism, so data types are determined implicitly

@@ -2,18 +2,30 @@ const fs = require('fs');
 const _ = require('lodash');
 
 const r_linefeed = /[\r\n]+/;
-const r_singleton = /^\s*[a-zA-Z][!-<>-~]*\s*=\s*[ -~]+$/;
-const r_linked_singleton = /^\s*[a-zA-Z][!-<>-~]*\s*=>\s*[a-zA-Z][!-<>-~]*(\.[a-zA-Z][!-<>-~]*)*\s*$/;
-const r_array_opener = /^\s*[a-zA-Z][!-<>-~]*\s*=\s*$/;
-const r_nest = /^\s*[a-zA-Z][!-<>-~]*(\s*=>\s*[a-zA-Z][!-<>-~]*)?\s*$/;
-const r_int = /^[0-9]+$/;
-const r_double = /^[0-9]+\.[0-9]*$/;
-const r_number = /^[0-9]+(\.[0-9]*)?$/;
-const r_value = /^\s*[ -~]+\s*$/;
 
-const r_quantity = /^[0-9]+[\.]?[0-9]*[a-zA-Z]+$/;
-const r_magnitude = /[0-9]+[\.]?[0-9]*/;
-const r_alpha = /[a-zA-Z]+/;
+const s_key = 							"\\s*[a-zA-Z][!-<>-~]*?(\\.[a-zA-Z][!-<>-~]*?)*\\s*";
+const s_value = 						"\\s*[\\t -~]+\\s*";
+const r_key = 							new RegExp(`^${s_key}$`);
+const r_value =		 					new RegExp(`^${s_value}$`);
+
+const r_singleton = 				new RegExp(`^${s_key}=${s_value}$`);
+const r_linked_singleton = 	new RegExp(`^${s_key}=>${s_key}$`);
+const r_nest = 							new RegExp(`^${s_key}(=>${s_key})?$`);
+// Be careful, this also matches empty string singletons
+const r_array_opener = 			new RegExp(`^${s_key}=\\s*$`);
+
+const s_int = 							"[\\-+]?[0-9]+";
+const s_number =						`${s_int}(\\.[0-9]+)?`;
+const r_int = 							new RegExp(`^${s_int}$`);
+const r_double = 						new RegExp(`^${s_int}\\.[0-9]+$`);
+const r_number = 						new RegExp(`${s_number}`);
+
+const s_alpha =							"[a-zA-Z]+";
+const r_alpha =							new RegExp(`${s_alpha}`);
+const r_quantity = 					new RegExp(`^${s_number}${s_alpha}$`);
+
+const s_filename =					"[^\\\\\\/:?*\"><|\\0]+";
+const r_path =							new RegExp(`^([a-zA-Z]:|\.{1,2}|~)?([\\\\\\/]${s_filename})*$`);
 
 class Configuration {
 	constructor(filename) {
@@ -122,25 +134,25 @@ class Configuration {
 				_.merge(parent[newKey], this._parseBlock(blockLines, root, parent[newKey]));
 			}
 			else if(r_array_opener.test(line)) {
-				if(!lines[lineNum + 1] || lines[lineNum + 1].search(/\S/) != line.search(/\S/)) {
-					return console.error("Expected List, but found:\n" + lines[lineNum + 1]);
+				if(!lines[lineNum + 1] || lines[lineNum + 1].search(/\S/) != line.search(/\S/) || lines[lineNum + 1].match(/\S/)[0] != '[') {
+					newKey = this._parseSingleton(line, parent);
+				} else {
+					var frags = line.split('=');
+					newKey = frags[0].trim();
+
+					parent[newKey] = [  ];
+
+					var currIndent = line.search(/\S/);
+					var blockEnd = lines.findIndex((f_line, f_index) => {
+						if(f_index <= lineNum) { return false; }
+						return f_line.search(/\S/) == currIndent && f_line.charAt(f_line.search(/\S/)) == ']';
+					});
+					if(blockEnd == -1) { return console.error('Could not find closing bracket to list:\n' + line + '\n' + lines[lineNum + 1]); }
+					skipTo = blockEnd + 1;
+
+					var blockLines = lines.slice(lineNum + 2, blockEnd);
+					this._parseBlock(blockLines, root, parent[newKey]);
 				}
-
-				var frags = line.split('=');
-				newKey = frags[0].trim();
-
-				parent[newKey] = [  ];
-
-				var currIndent = line.search(/\S/);
-				var blockEnd = lines.findIndex((f_line, f_index) => {
-					if(f_index <= lineNum) { return false; }
-					return f_line.search(/\S/) == currIndent && f_line.charAt(f_line.search(/\S/)) == ']';
-				});
-				if(blockEnd == -1) { return console.error('Could not find closing bracket to list:\n' + line + '\n' + lines[lineNum + 1]); }
-				skipTo = blockEnd + 1;
-
-				var blockLines = lines.slice(lineNum + 2, blockEnd);
-				this._parseBlock(blockLines, root, parent[newKey]);
 			}
 			else if(r_linked_singleton.test(line)) {
 				var frags = line.split('=>');
@@ -150,7 +162,7 @@ class Configuration {
 			else if(r_singleton.test(line)) {
 				newKey = this._parseSingleton(line, parent);
 			}
-			else if(isArray && r_value.test(line)) {
+			else if(Array.isArray(parent) && r_value.test(line)) {
 				parent.push(_parseValue(line.trim()));
 			}
 
@@ -162,14 +174,12 @@ class Configuration {
 	{
 		var frags = line.split('=');
 		var key = frags[0].trim();
-		var value = this._parseValue(frags[1].trim());
+		var value = this._parseValue(frags.slice(1).join('=').trim());
 		_.set(obj, key, value);
 		return key;
 	}
 	_parseValue(val)
 	{
-		val = val.replace(/^["']/, '').replace(/([^\\])["']$/, '$1').replace(/\\([\\ "'])/g, '$1').replace(/\\$/, ' ')
-
 		val = val.replace(/\$[\{]?([a-zA-Z][a-zA-Z0-9_]*)[\}]?/, (match, p1) => process.env[p1]);
 		val = val.replace(/\$([a-zA-Z][a-zA-Z0-9_]*)/, (match, p1) => process.env[p1]);
 
@@ -186,19 +196,33 @@ class Configuration {
 		if(r_int.test(val)) { return parseInt(val); }
 		if(r_double.test(val)) { return parseFloat(val); }
 		if(r_quantity.test(val)) {
-			var magnitude = parseFloat(val.match(r_magnitude)[0]);
+			var magnitude = parseFloat(val.match(r_number)[0]);
 			var unit = val.match(r_alpha)[0];
 			return { magnitude, unit };
 		}
 
+		val = val.replace(/^["']/, '').replace(/([^\\])["']$/, '$1').replace(/\\$/, ' ');
+		val = escapeChars(val);
+
 		// Path. '/' works on all OSs
-		if(val.startsWith('.') || val.indexOf('/') > -1 || val.search(/\\[^ "']/) > -1) {
+		if(r_path.test(val)) {
 			return val.replace(/\\/g, '/');
 		}
 
 		// Strings!
 		return val;
 	}
+}
+
+function escapeChars(str) {
+	return str.replace(/\\n/g, '\n')
+						.replace(/\\t/g, '\t')
+				 	 	.replace(/\\r/g, '\t')
+					 	.replace(/\\f/g, '\f')
+					 	.replace(/\\'/g, '\'')
+					 	.replace(/\\"/g, '\"')
+					 	.replace(/\\\\/g, '\\')
+					 	.replace(/\\ /g, ' ')
 }
 
 module.exports = Configuration

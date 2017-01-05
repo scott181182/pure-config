@@ -13,7 +13,7 @@ function loadFile(file)
 
 exports.test01 = function(test) {
 	test.expect(4);
-	
+
 	var config = loadFile('test01.pure');
 	test.deepEqual({ port: 8443, bind: '0.0.0.0' }, config._obj);
 
@@ -165,5 +165,20 @@ exports.test12 = function(test) {
 			log: { level: 'info', filename: 'app.log' }
 		}
 	}, config._obj);
+	test.done();
+}
+
+exports.autotest = function(test) {
+	var pureFiles = fs.readdirSync(__dirname + '/samples/auto').filter((file) => file.endsWith('.pure'));
+	test.expect(pureFiles.length);
+
+	pureFiles.forEach((filename) => {
+		var config = new PureConfig(`${__dirname}/samples/auto/${filename}`);
+		var jsonFile = fs.readFileSync(`${__dirname}/samples/auto/${filename.replace(/\.pure$/, '.json')}`, 'utf8');
+
+		console.log(`   testing ${filename}`);
+		test.deepEqual(JSON.parse(jsonFile), config._obj, filename);
+	});
+
 	test.done();
 }

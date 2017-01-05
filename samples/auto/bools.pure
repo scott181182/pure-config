@@ -1,0 +1,13 @@
+# Basic bool tests.
+true_value = true
+false_value = false
+
+# Test whitespace.
+whitespace_before = 						true
+whitespace_after = false
+
+# Bools can have any capitalization.
+capital_test_1 = True
+capital_test_2 = False
+capital_test_3 = trUe
+capital_test_4 = FALsE
