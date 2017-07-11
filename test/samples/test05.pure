@@ -1,0 +1,19 @@
+# Both the server and database config will reuse most of this:
+shared
+    log
+        filename = server.log
+        rolling = true
+        keep-count = 10
+        max-size = 50MB
+
+# Use the same log config as the shared one, but override the max-size.
+# Let's also add a date property only relevant for the server.
+server
+    log => shared.log
+        max-size = 10MB
+        date-format = "yyyy-mm-dd"
+
+# We're happy with the log defaults, but change the file name
+database
+    log => shared.log
+        filename = db.log

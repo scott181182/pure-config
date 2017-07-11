@@ -1,0 +1,1 @@
+app.logfile = $HOME/.logs/myapp.log

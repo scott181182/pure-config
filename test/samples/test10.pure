@@ -1,0 +1,4 @@
+key = \ \ \ \ this value has four spaces in front of it
+quotes = \"a quoted string\"
+spaces-and-quotes = "    \"quoted string with four spaces in front\""
+backslash = c:\\program files\\my app

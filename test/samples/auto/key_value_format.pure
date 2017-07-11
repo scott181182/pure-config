@@ -1,0 +1,13 @@
+
+# Test that the whitespace on either side of the '=' is optional.
+whitespace_test_1 = obviously this works
+whitespace_test_2= this should work too.
+whitespace_test_3 =this also works.
+whitespace_test_4	= tabs work too.
+
+# Test that nothing after the '=' sign corresponds to an empty string.
+empty_string =
+spaces_trimmed =
+
+# Test that multiple '=' signs are correctly parsed.
+equals_sign_test = this string has an = sign in it.

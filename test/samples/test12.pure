@@ -1,0 +1,6 @@
+%include test01.pure
+%include ../samples/test06.pure
+
+log => vars
+    log.level = info
+    log.filename = app.log

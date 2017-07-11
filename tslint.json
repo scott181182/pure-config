@@ -1,0 +1,31 @@
+{
+  "extends": "tslint:latest",
+  "rules": {
+      "interface-name": false,
+      "interface-over-type-literal": false,
+      "max-classes-per-file": false,
+      "no-consecutive-blank-lines": false,
+      "object-literal-sort-keys": false,
+      "one-line": false,
+      "radix": false,
+      "trailing-comma": false,
+      "whitespace": [
+          true,
+          "check-decl",
+          "check-operator",
+          "check-module",
+          "check-separator",
+          "check-type",
+          "check-typecast",
+          "check-preblock"
+      ],
+      "variable-name": [
+        true,
+        "ban-keywords",
+        "check-format",
+        "allow-leading-underscore",
+        "allow-pascal-case",
+        "allow-snake-case"
+      ]
+  }
+}

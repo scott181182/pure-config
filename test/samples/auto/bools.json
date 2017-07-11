@@ -1,0 +1,12 @@
+{
+	"true_value" : true,
+	"false_value" : false,
+
+	"whitespace_before" : true,
+	"whitespace_after" : false,
+
+	"capital_test_1" : true,
+	"capital_test_2" : false,
+	"capital_test_3" : true,
+	"capital_test_4" : false
+}
