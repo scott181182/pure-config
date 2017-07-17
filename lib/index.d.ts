@@ -4,6 +4,7 @@ export declare type Quantity = {
     magnitude: number;
 };
 export declare class Configuration {
+    private path;
     private directory;
     private object;
     constructor(filename: string);

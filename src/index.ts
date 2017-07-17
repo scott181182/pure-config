@@ -1,4 +1,6 @@
 import { readFileSync } from "fs";
+import { dirname, resolve } from "path";
+
 import * as _ from "lodash";
 
 export type Path = string;
@@ -32,16 +34,16 @@ const r_path =             new RegExp(`^([a-zA-Z]:|\.{1,2}|~)?([\\\\\\/]${s_file
 
 export class Configuration
 {
+    private path: string;
     private directory: string;
     private object: any;
 
     constructor(filename: string)
     {
-        const data = readFileSync(filename, "utf8");
+        this.path = resolve(filename);
+        const data = readFileSync(this.path, "utf8");
 
-        const dirTree = filename.split("/");
-        dirTree.pop();
-        this.directory = dirTree.join("/");
+        this.directory = dirname(this.path);
 
         // Holds the configuration values
         this.object = {  };
@@ -71,7 +73,12 @@ export class Configuration
         const val = this.get(key);
         return typeof val === "string" ? val : JSON.stringify(val);
     }
-    public getPath(key: string): string { return this.get(key); }
+    public getPath(key: string): string {
+        let path: string = this.get(key);
+        if(path[0] === "~") { path = path.replace(/^~/, process.env.HOME); }
+        path = resolve(this.directory, path);
+        return path;
+    }
     public getQuantity(key: string): Quantity {
         const val = this.get(key);
         return val.magnitude && val.unit ? val : {
@@ -116,7 +123,7 @@ export class Configuration
             if(_.startsWith(line.trim(), "#")) { return; }
             if(_.startsWith(line.trim(), "%include")) {
                 return _.merge(root,
-                    new Configuration(this.directory + "/" + line.substr(line.indexOf(" ") + 1)).object);
+                    new Configuration(resolve(this.directory, line.substr(line.indexOf(" ") + 1))).object);
             }
 
             let newKey: string;
