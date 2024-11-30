@@ -5,6 +5,10 @@
 # Pure Config
 JavaScript/Typescript Configuration Parser and API for the [Pure Config Specification](https://github.com/pureconfig/pureconfig)
 
+> [!IMPORTANT]
+> This project was originally written when the above PureConfig project was a novel configuration file format that I enjoyed.
+> The PureConfig project has since changed scope, so this TypeScript binding for it is pretty much moot.
+
 ## Configuration files
 See the [Pure Config Specification](https://github.com/pureconfig/pureconfig) for how to write .pure config files
 
